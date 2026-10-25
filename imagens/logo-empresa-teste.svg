@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" role="img" aria-labelledby="titulo descricao">
+  <title id="titulo">Logo empresa.teste</title>
+  <desc id="descricao">Símbolo floral com o nome empresa.teste</desc>
+  <rect width="400" height="400" rx="200" fill="#fffaf5"/>
+  <circle cx="200" cy="200" r="184" fill="none" stroke="#d27c67" stroke-width="10"/>
+  <g fill="none" stroke="#be6e5a" stroke-width="10" stroke-linecap="round">
+    <path d="M200 96c-42 0-56 38-38 66 12 19 38 30 38 30s26-11 38-30c18-28 4-66-38-66Z" fill="#fce9e4"/>
+    <path d="M200 192c-44-19-82 3-74 42 6 29 42 43 74 31" fill="#fce9e4"/>
+    <path d="M200 192c44-19 82 3 74 42-6 29-42 43-74 31" fill="#fce9e4"/>
+    <path d="M200 192v92"/>
+  </g>
+  <text x="200" y="330" text-anchor="middle" fill="#2d2d2d" font-family="Georgia, serif" font-size="36" font-weight="700">empresa.teste</text>
+</svg>
