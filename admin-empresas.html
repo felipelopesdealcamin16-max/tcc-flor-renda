@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Empresas parceiras | Administração</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body class="pagina-empresa-parceira pagina-admin-empresas">
+    <header class="cabecalho-empresa">
+        <a href="admin-empresas.html" class="logo">
+            <img src="imagens/logo.jpeg" alt="Logo Flor & Renda">
+            <h2>Flor & Renda</h2>
+        </a>
+
+        <button type="button" class="coracao" onclick="sairAdmin()">Sair</button>
+    </header>
+
+    <main class="area-empresa">
+        <section class="painel-empresa painel-admin">
+            <p class="etiqueta-empresa">ADMINISTRAÇÃO</p>
+            <h1>Empresas parceiras</h1>
+            <p class="texto-empresa">
+                Analise os cadastros e escolha quais marcas podem participar da loja.
+            </p>
+
+            <div id="listaEmpresas" class="lista-empresas-admin">
+                <p class="admin-carregando">Carregando empresas...</p>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        const listaEmpresas = document.getElementById("listaEmpresas");
+
+        function sairAdmin() {
+            fetch("backend/logout.php", { method: "POST" })
+                .finally(function() {
+                    localStorage.removeItem("usuarioLogado");
+                    window.location.href = "login.html";
+                });
+        }
+
+        function formatarCnpj(cnpj) {
+            return cnpj.replace(
+                /^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})$/,
+                "$1.$2.$3/$4-$5"
+            );
+        }
+
+        function escaparHtml(valor) {
+            const elemento = document.createElement("div");
+            elemento.textContent = valor || "";
+            return elemento.innerHTML;
+        }
+
+        function renderizarEmpresas(empresas) {
+            if (empresas.length === 0) {
+                listaEmpresas.innerHTML =
+                    '<p class="admin-vazio">Nenhuma empresa cadastrada.</p>';
+                return;
+            }
+
+            listaEmpresas.innerHTML = empresas.map(function(empresa) {
+                const site = empresa.site
+                    ? '<a href="' + escaparHtml(empresa.site) +
+                        '" target="_blank" rel="noopener">Visitar site</a>'
+                    : "Não informado";
+
+                return `
+                    <article class="cartao-empresa-admin">
+                        <div class="admin-empresa-titulo">
+                            <div>
+                                <h2>${escaparHtml(empresa.nome_fantasia)}</h2>
+                                <p>${escaparHtml(empresa.razao_social)}</p>
+                            </div>
+                            <strong class="selo-status status-${escaparHtml(empresa.status)}">
+                                ${escaparHtml(empresa.status)}
+                            </strong>
+                        </div>
+
+                        <dl class="admin-dados-empresa">
+                            <div><dt>CNPJ</dt><dd>${formatarCnpj(empresa.cnpj)}</dd></div>
+                            <div><dt>E-mail</dt><dd>${escaparHtml(empresa.email)}</dd></div>
+                            <div><dt>Telefone</dt><dd>${escaparHtml(empresa.telefone)}</dd></div>
+                            <div><dt>Site</dt><dd>${site}</dd></div>
+                        </dl>
+
+                        <div class="admin-acoes">
+                            <button type="button" class="botao-reprovar"
+                                onclick="alterarStatus(${empresa.id}, 'reprovada')">
+                                Reprovar
+                            </button>
+                            <button type="button" class="botao-aprovar"
+                                onclick="alterarStatus(${empresa.id}, 'aprovada')">
+                                Aprovar
+                            </button>
+                        </div>
+                    </article>
+                `;
+            }).join("");
+        }
+
+        function carregarEmpresas() {
+            fetch("backend/listar_empresas.php")
+                .then(function(resposta) {
+                    if (resposta.status === 401) {
+                        window.location.href = "login.html";
+                        throw new Error("Acesso não autorizado");
+                    }
+                    return resposta.json();
+                })
+                .then(function(resultado) {
+                    if (!resultado.sucesso) {
+                        throw new Error(resultado.mensagem);
+                    }
+                    renderizarEmpresas(resultado.empresas);
+                })
+                .catch(function(erro) {
+                    if (erro.message !== "Acesso não autorizado") {
+                        listaEmpresas.innerHTML =
+                            '<p class="admin-vazio">Não foi possível carregar as empresas.</p>';
+                    }
+                });
+        }
+
+        function alterarStatus(empresaId, status) {
+            const dados = new FormData();
+            dados.append("empresa_id", empresaId);
+            dados.append("status", status);
+
+            fetch("backend/atualizar_status_empresa.php", {
+                method: "POST",
+                body: dados
+            })
+                .then(function(resposta) {
+                    return resposta.json().then(function(resultado) {
+                        if (!resposta.ok || !resultado.sucesso) {
+                            throw new Error(resultado.mensagem);
+                        }
+                        return resultado;
+                    });
+                })
+                .then(function(resultado) {
+                    alert(resultado.mensagem);
+                    carregarEmpresas();
+                })
+                .catch(function(erro) {
+                    alert(erro.message || "Não foi possível atualizar o cadastro.");
+                });
+        }
+
+        carregarEmpresas();
+    </script>
+</body>
+
+</html>

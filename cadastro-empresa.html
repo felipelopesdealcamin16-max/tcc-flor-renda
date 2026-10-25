@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastrar empresa parceira | Flor & Renda</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body class="pagina-login pagina-cadastro-empresa">
+
+    <div class="login-container cadastro-empresa-container">
+
+        <section class="login-apresentacao empresa-apresentacao">
+            <div class="login-logo">
+                <img src="imagens/logo.jpeg" alt="Logo Flor & Renda">
+            </div>
+
+            <h1>Seja uma empresa parceira</h1>
+
+            <p>
+                Cadastre sua marca para fazer parte da Flor & Renda,
+                junto com nossas lojas parceiras.
+            </p>
+        </section>
+
+        <section class="login-caixa empresa-cadastro-caixa">
+            <h2>Cadastrar empresa</h2>
+
+            <p class="login-subtitulo">
+                Envie os dados da sua marca para análise.
+            </p>
+
+            <form id="formCadastroEmpresa" class="formulario-empresa">
+
+                <label>
+                    <span>Nome fantasia</span>
+                    <input
+                        type="text"
+                        name="nome_fantasia"
+                        placeholder="Nome usado pela marca"
+                        required
+                    >
+                </label>
+
+                <label>
+                    <span>Razão social</span>
+                    <input
+                        type="text"
+                        name="razao_social"
+                        placeholder="Nome registrado da empresa"
+                        required
+                    >
+                </label>
+
+                <label>
+                    <span>CNPJ</span>
+                    <input
+                        type="text"
+                        name="cnpj"
+                        inputmode="numeric"
+                        maxlength="18"
+                        placeholder="00.000.000/0000-00"
+                        required
+                    >
+                </label>
+
+                <label>
+                    <span>Telefone</span>
+                    <input
+                        type="tel"
+                        name="telefone"
+                        placeholder="(00) 00000-0000"
+                        required
+                    >
+                </label>
+
+                <label>
+                    <span>E-mail</span>
+                    <input
+                        type="email"
+                        name="email"
+                        placeholder="contato@suaempresa.com"
+                        required
+                    >
+                </label>
+
+                <label>
+                    <span>Site <small>(opcional)</small></span>
+                    <input
+                        type="url"
+                        name="site"
+                        placeholder="https://suaempresa.com"
+                    >
+                </label>
+
+                <label class="campo-empresa-largo">
+                    <span>URL da logo <small>(opcional)</small></span>
+                    <input
+                        type="url"
+                        name="logo"
+                        placeholder="https://suaempresa.com/logo.png"
+                    >
+                </label>
+
+                <label class="campo-empresa-largo">
+                    <span>Senha</span>
+                    <input
+                        type="password"
+                        name="senha"
+                        minlength="6"
+                        placeholder="Mínimo de 6 caracteres"
+                        required
+                    >
+                </label>
+
+                <button
+                    type="submit"
+                    class="botao-login-principal campo-empresa-largo"
+                >
+                    Enviar cadastro
+                </button>
+
+            </form>
+
+            <p class="login-cadastro">
+                Já possui cadastro?
+                <a href="login.html">Entrar</a>
+            </p>
+
+            <p class="login-cadastro login-empresa">
+                Quer comprar como cliente?
+                <a href="cadastro.html">Criar conta de cliente</a>
+            </p>
+        </section>
+
+    </div>
+
+    <script>
+        document.getElementById("formCadastroEmpresa").addEventListener(
+            "submit",
+            function(event) {
+                event.preventDefault();
+
+                const formulario = this;
+                const botao = formulario.querySelector("button");
+                const dados = new FormData(formulario);
+
+                botao.disabled = true;
+                botao.textContent = "Enviando...";
+
+                fetch("backend/cadastrar_empresa.php", {
+                    method: "POST",
+                    body: dados
+                })
+                .then(function(resposta) {
+                    return resposta.text();
+                })
+                .then(function(resultado) {
+                    if (resultado.trim() === "sucesso") {
+                        alert(
+                            "Empresa cadastrada com sucesso! " +
+                            "Seu cadastro está aguardando análise."
+                        );
+                        window.location.href = "login.html";
+                        return;
+                    }
+
+                    alert(resultado);
+                    botao.disabled = false;
+                    botao.textContent = "Enviar cadastro";
+                })
+                .catch(function() {
+                    alert("Não foi possível cadastrar a empresa.");
+                    botao.disabled = false;
+                    botao.textContent = "Enviar cadastro";
+                });
+            }
+        );
+    </script>
+
+</body>
+
+</html>

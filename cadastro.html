@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Criar conta | Flor & Renda</title>
+
+    <link rel="stylesheet" href="style.css">
+
+</head>
+
+<body class="pagina-login">
+
+    <div class="login-container">
+
+        <!-- LADO DA MARCA -->
+        <section class="login-apresentacao">
+
+            <div class="login-logo">
+                <img src="imagens/logo.jpeg" alt="Logo Flor & Renda">
+            </div>
+
+            <h1>Flor & Renda</h1>
+
+            <p>
+                Crie sua conta e aproveite
+                a experiência Flor & Renda.
+            </p>
+
+        </section>
+
+
+        <!-- LADO DO CADASTRO -->
+        <section class="login-caixa">
+
+            <h2>Criar conta</h2>
+
+            <p class="login-subtitulo">
+                Preencha seus dados para se cadastrar.
+            </p>
+
+            <form id="formCadastro">
+
+                <label for="nome">Nome</label>
+
+                <input
+                    type="text"
+                    id="nome"
+                    name="nome"
+                    placeholder="Digite seu nome"
+                    required
+                >
+
+
+                <label for="emailCadastro">E-mail</label>
+
+                <input
+                    type="email"
+                    id="emailCadastro"
+                    name="email"
+                    placeholder="Digite seu e-mail"
+                    required
+                >
+
+
+                <label for="senhaCadastro">Senha</label>
+
+                <input
+                    type="password"
+                    id="senhaCadastro"
+                    name="senha"
+                    placeholder="Digite sua senha"
+                    required
+                >
+
+
+                <button
+                    type="submit"
+                    class="botao-login-principal">
+                    Criar conta
+                </button>
+
+            </form>
+
+
+            <p class="login-cadastro">
+
+                Já tem uma conta?
+
+                <a href="login.html">
+                    Entrar
+                </a>
+
+            </p>
+
+            <p class="login-cadastro login-empresa">
+                Representa uma marca?
+
+                <a href="cadastro-empresa.html">
+                    Cadastre sua empresa parceira
+                </a>
+            </p>
+
+        </section>
+
+    </div>
+
+
+    <script>
+
+        document.getElementById("formCadastro").addEventListener("submit", function(event) {
+
+            event.preventDefault();
+
+            const formulario = this;
+
+            const dados = new FormData(formulario);
+
+
+            fetch("backend/cadastrar_usuario.php", {
+
+                method: "POST",
+
+                body: dados
+
+            })
+
+            .then(function(resposta) {
+
+                return resposta.text();
+
+            })
+
+            .then(function(resultado) {
+
+                if (resultado.trim() === "sucesso") {
+
+                    alert("Cadastro realizado com sucesso!");
+
+                    window.location.href = "login.html";
+
+                } else {
+
+                    alert(resultado);
+
+                }
+
+            })
+
+            .catch(function() {
+
+                alert("Erro ao realizar o cadastro.");
+
+            });
+
+        });
+
+    </script>
+
+</body>
+
+</html>

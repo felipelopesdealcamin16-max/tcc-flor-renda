@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Área da empresa | Flor & Renda</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body class="pagina-empresa-parceira">
+
+    <header class="cabecalho-empresa">
+        <a href="empresa.html" class="logo">
+            <img src="imagens/logo.jpeg" alt="Logo Flor & Renda">
+            <h2>Flor & Renda</h2>
+        </a>
+
+        <button type="button" class="coracao" onclick="sairEmpresa()">
+            Sair
+        </button>
+    </header>
+
+    <main class="area-empresa">
+        <section class="painel-empresa">
+            <p class="etiqueta-empresa">EMPRESA PARCEIRA</p>
+            <h1 id="nomeEmpresa">Carregando empresa...</h1>
+            <p class="texto-empresa">
+                Acompanhe os dados enviados para a Flor & Renda.
+            </p>
+
+            <div class="status-empresa">
+                <span>Status do cadastro</span>
+                <strong id="statusEmpresa">Carregando</strong>
+            </div>
+
+            <div class="dados-empresa">
+                <article>
+                    <span>Razão social</span>
+                    <strong id="razaoEmpresa">-</strong>
+                </article>
+
+                <article>
+                    <span>CNPJ</span>
+                    <strong id="cnpjEmpresa">-</strong>
+                </article>
+
+                <article>
+                    <span>Telefone</span>
+                    <strong id="telefoneEmpresa">-</strong>
+                </article>
+
+                <article>
+                    <span>Site</span>
+                    <strong id="siteEmpresa">Não informado</strong>
+                </article>
+            </div>
+
+            <p class="aviso-empresa">
+                <span id="mensagemStatusEmpresa">
+                Cadastros pendentes passam por análise antes de a marca
+                aparecer entre as lojas parceiras.
+                </span>
+            </p>
+        </section>
+
+        <section id="gestaoProdutos" class="painel-empresa painel-produtos-empresa" hidden>
+            <p class="etiqueta-empresa">CATÁLOGO DA MARCA</p>
+            <h2>Adicionar produto</h2>
+            <p class="texto-empresa">
+                Os produtos cadastrados aqui aparecem automaticamente na loja principal.
+            </p>
+
+            <form id="formProdutoEmpresa" class="form-produto-empresa">
+                <label>
+                    <span>Nome do produto</span>
+                    <input type="text" name="nome" maxlength="150" required>
+                </label>
+
+                <label>
+                    <span>Preço</span>
+                    <input type="text" name="preco" inputmode="decimal"
+                        placeholder="Ex.: 159,90" required>
+                </label>
+
+                <label>
+                    <span>Estoque</span>
+                    <input type="number" name="estoque" min="0" value="1" required>
+                </label>
+
+                <label class="campo-produto-imagem">
+                    <span>URL da imagem</span>
+                    <input type="url" name="imagem"
+                        placeholder="https://exemplo.com/produto.jpg">
+                </label>
+
+                <button type="submit" class="botao-aprovar">Publicar produto</button>
+            </form>
+
+            <h2 class="titulo-meus-produtos">Meus produtos</h2>
+            <div id="listaProdutosEmpresa" class="lista-produtos-empresa"></div>
+        </section>
+    </main>
+
+    <script>
+        function sairEmpresa() {
+            fetch("backend/logout.php", { method: "POST" })
+                .finally(function() {
+                    localStorage.removeItem("usuarioLogado");
+                    window.location.href = "login.html";
+                });
+        }
+
+        function formatarCnpj(cnpj) {
+            return cnpj.replace(
+                /^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})$/,
+                "$1.$2.$3/$4-$5"
+            );
+        }
+
+        function escaparHtml(valor) {
+            const elemento = document.createElement("div");
+            elemento.textContent = valor || "";
+            return elemento.innerHTML;
+        }
+
+        function carregarProdutosEmpresa() {
+            fetch("backend/produtos_empresa.php")
+                .then(function(resposta) { return resposta.json(); })
+                .then(function(resultado) {
+                    if (!resultado.sucesso) {
+                        throw new Error(resultado.mensagem);
+                    }
+
+                    const lista = document.getElementById("listaProdutosEmpresa");
+                    if (resultado.produtos.length === 0) {
+                        lista.innerHTML = '<p class="admin-vazio">Nenhum produto cadastrado.</p>';
+                        return;
+                    }
+
+                    lista.innerHTML = resultado.produtos.map(function(produto) {
+                        const preco = Number(produto.preco).toFixed(2).replace(".", ",");
+                        return `
+                            <article class="item-produto-empresa">
+                                <img src="${escaparHtml(produto.imagem)}"
+                                    alt="${escaparHtml(produto.nome)}">
+                                <div>
+                                    <strong>${escaparHtml(produto.nome)}</strong>
+                                    <span>R$ ${preco} · ${produto.estoque} em estoque</span>
+                                </div>
+                                <button type="button" onclick="excluirProduto(${produto.id})">
+                                    Excluir
+                                </button>
+                            </article>
+                        `;
+                    }).join("");
+                });
+        }
+
+        function excluirProduto(produtoId) {
+            if (!confirm("Deseja excluir este produto da loja?")) {
+                return;
+            }
+
+            const dados = new FormData();
+            dados.append("produto_id", produtoId);
+
+            fetch("backend/excluir_produto_empresa.php", {
+                method: "POST",
+                body: dados
+            })
+                .then(function(resposta) { return resposta.json(); })
+                .then(function(resultado) {
+                    if (!resultado.sucesso) {
+                        throw new Error(resultado.mensagem);
+                    }
+                    carregarProdutosEmpresa();
+                })
+                .catch(function(erro) { alert(erro.message); });
+        }
+
+        document.getElementById("formProdutoEmpresa")
+            .addEventListener("submit", function(event) {
+                event.preventDefault();
+                const formulario = this;
+                const botao = formulario.querySelector("button[type='submit']");
+                botao.disabled = true;
+
+                fetch("backend/cadastrar_produto_empresa.php", {
+                    method: "POST",
+                    body: new FormData(formulario)
+                })
+                    .then(function(resposta) {
+                        return resposta.json().then(function(resultado) {
+                            if (!resposta.ok || !resultado.sucesso) {
+                                throw new Error(resultado.mensagem);
+                            }
+                            return resultado;
+                        });
+                    })
+                    .then(function(resultado) {
+                        alert(resultado.mensagem);
+                        formulario.reset();
+                        formulario.elements.estoque.value = 1;
+                        carregarProdutosEmpresa();
+                    })
+                    .catch(function(erro) { alert(erro.message); })
+                    .finally(function() { botao.disabled = false; });
+            });
+
+        fetch("backend/dados_empresa.php")
+            .then(function(resposta) {
+                if (!resposta.ok) {
+                    throw new Error("Acesso não autorizado");
+                }
+
+                return resposta.json();
+            })
+            .then(function(resultado) {
+                const empresa = resultado.empresa;
+
+                document.getElementById("nomeEmpresa").textContent =
+                    empresa.nome_fantasia;
+                document.getElementById("razaoEmpresa").textContent =
+                    empresa.razao_social;
+                document.getElementById("cnpjEmpresa").textContent =
+                    formatarCnpj(empresa.cnpj);
+                document.getElementById("telefoneEmpresa").textContent =
+                    empresa.telefone;
+                document.getElementById("siteEmpresa").textContent =
+                    empresa.site || "Não informado";
+                document.getElementById("statusEmpresa").textContent =
+                    empresa.status;
+
+                const mensagemStatus = document.getElementById("mensagemStatusEmpresa");
+                if (empresa.status === "aprovada") {
+                    mensagemStatus.textContent =
+                        "Cadastro aprovado. Seu catálogo já pode ser publicado na loja.";
+                    document.getElementById("gestaoProdutos").hidden = false;
+                    carregarProdutosEmpresa();
+                } else if (empresa.status === "reprovada") {
+                    mensagemStatus.textContent =
+                        "Cadastro reprovado. Entre em contato com a Flor & Renda para revisar os dados.";
+                }
+            })
+            .catch(function() {
+                window.location.href = "login.html";
+            });
+    </script>
+
+</body>
+
+</html>

@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Finalizar Compra | Flor & Renda</title>
+
+    <link rel="stylesheet" href="style.css">
+
+</head>
+
+<body>
+
+
+<header class="cabecalho">
+
+    <a href="index.html" class="logo">
+        <img src="imagens/logo.jpeg" alt="Logo Flor & Renda">
+        <h2>Flor & Renda</h2>
+    </a>
+
+    <nav class="menu">
+
+        <a href="index.html">
+            Início
+        </a>
+
+        <a href="index.html#vestidos">
+            Vestidos
+        </a>
+
+        <a href="index.html#saias">
+            Saias
+        </a>
+
+        <a href="carrinho.html">
+            Voltar ao Carrinho
+        </a>
+
+    </nav>
+
+</header>
+
+
+
+<main>
+
+
+<section id="checkout">
+
+    <div class="titulo">
+
+        <h1>Finalizar Compra</h1>
+
+        <p>
+            Preencha seus dados para concluir seu pedido.
+        </p>
+
+    </div>
+
+
+    <form id="formCompra">
+
+        <fieldset>
+
+            <legend>Dados do Cliente</legend>
+
+            <div class="grade-formulario">
+
+                <label class="campo-formulario campo-largo">
+                    <span>Nome completo</span>
+                    <input type="text" name="nome" required>
+                </label>
+
+                <label class="campo-formulario">
+                    <span>E-mail</span>
+                    <input type="email" name="email" required>
+                </label>
+
+                <label class="campo-formulario">
+                    <span>Telefone</span>
+                    <input type="tel" name="telefone" required>
+                </label>
+
+                <label class="campo-formulario">
+                    <span>CPF</span>
+                    <input type="text" name="cpf" required>
+                </label>
+
+            </div>
+
+        </fieldset>
+
+
+        <fieldset>
+
+            <legend>Endereço de Entrega</legend>
+
+            <div class="grade-formulario">
+
+                <label class="campo-formulario">
+                    <span>CEP</span>
+                    <input type="text" name="cep" required>
+                </label>
+
+                <label class="campo-formulario campo-largo">
+                    <span>Rua</span>
+                    <input type="text" name="rua" required>
+                </label>
+
+                <label class="campo-formulario">
+                    <span>Número</span>
+                    <input type="text" name="numero" required>
+                </label>
+
+                <label class="campo-formulario">
+                    <span>Complemento</span>
+                    <input type="text" name="complemento">
+                </label>
+
+                <label class="campo-formulario">
+                    <span>Bairro</span>
+                    <input type="text" name="bairro" required>
+                </label>
+
+                <label class="campo-formulario">
+                    <span>Cidade</span>
+                    <input type="text" name="cidade" required>
+                </label>
+
+                <label class="campo-formulario">
+                    <span>Estado</span>
+                    <input type="text" name="estado" required>
+                </label>
+
+            </div>
+
+        </fieldset>
+
+
+        <fieldset>
+
+            <legend>Forma de Pagamento</legend>
+
+            <div class="opcoes-pagamento">
+
+                <label>
+                    <input type="radio" name="pagamento" value="Pix" required>
+                    <span>PIX</span>
+                </label>
+
+                <label>
+                    <input type="radio" name="pagamento" value="Cartão de Crédito">
+                    <span>Cartão de Crédito</span>
+                </label>
+
+                <label>
+                    <input type="radio" name="pagamento" value="Boleto Bancário">
+                    <span>Boleto Bancário</span>
+                </label>
+
+            </div>
+
+        </fieldset>
+
+
+        <button type="submit" class="confirmar-pedido">
+            Confirmar Pedido
+        </button>
+
+    </form>
+
+</section>
+
+
+</main>
+
+
+<script src="script.js"></script>
+
+</body>
+
+</html>

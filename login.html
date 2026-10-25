@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Login | Flor & Renda</title>
+
+    <link rel="stylesheet" href="style.css">
+
+</head>
+
+<body class="pagina-login">
+
+    <div class="login-container">
+
+        <!-- LADO DA MARCA -->
+        <section class="login-apresentacao">
+
+            <div class="login-logo">
+
+                <img
+                    src="imagens/logo.jpeg"
+                    alt="Logo Flor & Renda"
+                >
+
+            </div>
+
+            <h1>
+                Flor & Renda
+            </h1>
+
+            <p>
+                Vista seus momentos com delicadeza,
+                estilo e elegância.
+            </p>
+
+        </section>
+
+
+        <!-- LADO DO LOGIN -->
+        <section class="login-caixa">
+
+            <h2>
+                Bem-vindo!
+            </h2>
+
+            <p class="login-subtitulo">
+                Entre na sua conta para continuar.
+            </p>
+
+
+            <form id="formLogin">
+
+                <label for="email">
+                    E-mail
+                </label>
+
+                <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    placeholder="Digite seu e-mail"
+                    required
+                >
+
+
+                <label for="senha">
+                    Senha
+                </label>
+
+                <input
+                    type="password"
+                    id="senha"
+                    name="senha"
+                    placeholder="Digite sua senha"
+                    required
+                >
+
+
+                <button
+                    type="submit"
+                    class="botao-login-principal"
+                >
+                    Entrar
+                </button>
+
+            </form>
+
+
+            <p class="login-cadastro">
+
+                Ainda não tem uma conta?
+
+                <a href="cadastro.html">
+                    Criar conta
+                </a>
+
+            </p>
+
+            <p class="login-cadastro login-empresa">
+                É uma empresa parceira?
+
+                <a href="cadastro-empresa.html">
+                    Cadastrar empresa
+                </a>
+            </p>
+
+        </section>
+
+    </div>
+
+
+    <script>
+
+document.getElementById("formLogin").addEventListener("submit", function(event) {
+
+    event.preventDefault();
+
+    const dados = new FormData(this);
+
+    fetch("backend/login.php", {
+        method: "POST",
+        body: dados
+    })
+
+    .then(function(resposta) {
+
+        if (!resposta.ok) {
+            throw new Error("HTTP " + resposta.status);
+        }
+
+        return resposta.text();
+
+    })
+
+    .then(function(resultado) {
+
+        resultado = resultado.trim();
+
+        console.log("Resposta do PHP:", resultado);
+
+        const partesResultado = resultado.split("|");
+
+        if (partesResultado[0] === "sucesso") {
+
+            const tipoUsuario = partesResultado[1] || "cliente";
+
+            localStorage.setItem("usuarioLogado", "true");
+
+            alert("Login realizado com sucesso!");
+
+            if (tipoUsuario === "empresa") {
+                window.location.href = "empresa.html";
+            } else if (tipoUsuario === "admin") {
+                window.location.href = "admin-empresas.html";
+            } else {
+                window.location.href = "index.html";
+            }
+
+        } else {
+
+            alert(resultado);
+
+        }
+
+    })
+
+    .catch(function(erro) {
+
+        console.error(erro);
+
+        alert(
+            "Não foi possível conectar ao sistema de login.\n\n" +
+            "Verifique se o Apache e o MySQL estão ligados."
+        );
+
+    });
+
+});
+
+
+    </script>
+
+</body>
+
+</html>
