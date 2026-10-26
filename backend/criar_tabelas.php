@@ -88,6 +88,27 @@ if (!$conexao->query($sqlUsuarios)) {
     die("Erro ao criar a tabela de usuários: " . $conexao->error);
 }
 
+/* Conta inicial para instalações locais e deploys. Não altera contas existentes. */
+$emailAdminInicial = "admin@doceflor.com";
+$consultaAdminInicial = $conexao->prepare("SELECT id FROM usuarios WHERE email = ? LIMIT 1");
+$consultaAdminInicial->bind_param("s", $emailAdminInicial);
+$consultaAdminInicial->execute();
+$adminInicialExiste = $consultaAdminInicial->get_result()->num_rows > 0;
+$consultaAdminInicial->close();
+
+if (!$adminInicialExiste) {
+    $hashAdminInicial = password_hash("admin", PASSWORD_DEFAULT);
+    // A chave única do e-mail também protege contra inicializações simultâneas.
+    $inserirAdminInicial = $conexao->prepare(
+        "INSERT INTO usuarios (nome, email, senha, tipo)
+         VALUES ('Administrador', ?, ?, 'admin')
+         ON DUPLICATE KEY UPDATE id = id"
+    );
+    $inserirAdminInicial->bind_param("ss", $emailAdminInicial, $hashAdminInicial);
+    $inserirAdminInicial->execute();
+    $inserirAdminInicial->close();
+}
+
 if (!$conexao->query($sqlEmpresas)) {
     die("Erro ao criar a tabela de empresas parceiras: " . $conexao->error);
 }
