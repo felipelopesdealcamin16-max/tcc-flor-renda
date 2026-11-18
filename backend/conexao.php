@@ -1,26 +1,34 @@
+
 <?php
 
-$servidor = getenv("MYSQLHOST") ?: "localhost";
-$porta = getenv("MYSQLPORT") ?: "3306";
-$usuario = getenv("MYSQLUSER") ?: "root";
-$senha = getenv("MYSQLPASSWORD") ?: "";
-$banco = getenv("MYSQLDATABASE") ?: "flor_renda";
+mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
 
-$conexao = new mysqli(
-    $servidor,
-    $usuario,
-    $senha,
-    $banco,
-    intval($porta)
-);
+$servidor = getenv("MYSQLHOST");
+$porta = getenv("MYSQLPORT");
+$usuario = getenv("MYSQLUSER");
+$senha = getenv("MYSQLPASSWORD");
+$banco = getenv("MYSQLDATABASE");
 
-if ($conexao->connect_error) {
+if (!$servidor || !$porta || !$usuario || !$banco) {
     http_response_code(500);
-    die("Não foi possível conectar ao banco de dados.");
+    die("Configurações do banco não encontradas.");
 }
 
-$conexao->set_charset("utf8mb4");
+try {
+    $conexao = new mysqli(
+        $servidor,
+        $usuario,
+        $senha,
+        $banco,
+        (int)$porta
+    );
 
-include_once __DIR__ . "/criar_tabelas.php";
+    $conexao->set_charset("utf8mb4");
+
+} catch (mysqli_sql_exception $e) {
+    error_log("Erro MySQL: " . $e->getMessage());
+    http_response_code(500);
+    die("Não foi possível conectar ao banco.");
+}
 
 ?>
