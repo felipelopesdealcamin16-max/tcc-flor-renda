@@ -1,5 +1,5 @@
 <?php
-
+require_once __DIR__ . "/conexao.php";
 /*
 Este arquivo cria as tabelas necessárias quando elas ainda não existem.
 Isso facilita a primeira execução local e o deploy no Railway.
